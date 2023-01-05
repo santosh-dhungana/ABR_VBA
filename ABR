@@ -1,0 +1,421 @@
+Option Explicit
+Dim looper As control
+
+Private Sub UserForm_Initialize()
+
+    Dim max_but As Boolean
+    Dim min_but As Boolean
+    Dim resizable As Boolean
+    With Me
+        .StartUpPosition = 1
+        .Width = Application.Width * 0.95
+        .Height = Application.Height * 0.95
+        .BackColor = RGB(255, 204, 153)
+        .ScrollBars = fmScrollBarsBoth
+    End With
+    
+    For Each looper In Me.Controls
+        On Error Resume Next
+        If TypeOf looper Is MSForms.TextBox Then
+            With looper
+                .Locked = True
+            End With
+        End If
+    Next looper
+    Call populate_Number
+    Call layout_configurer
+    Call populate_length
+    Call populate_breadth
+    Call populate_depth
+    Call populate_quantity
+    Call populate_rate
+   Call detail_estimate
+    max_but = ShowMaximizeButton(UF:=Me)
+    min_but = ShowMinimizeButton(UF:=Me)
+    resizable = MakeFormResizable(UF:=Me, Sizable:=True)
+    'Me.Show
+    
+        
+End Sub
+
+Private Sub populate_Number()
+
+    lbSolingtype.Caption = UserForm1.CBSoling.Value
+    If UserForm1.CBMaterial.Value = "Concrete" And UserForm1.CBSoling.Value = "Dry Stone Soling" Then
+        lbMaterialtype_work.Caption = "Stone work in 1:6 cement mortar for"
+    ElseIf UserForm1.CBMaterial.Value = "stone" Then
+        lbMaterialtype_work.Caption = "Stone work in 1:6 cement mortar for"
+    Else
+        lbMaterialtype_work.Caption = "Brick work in 1:4 cement mortar for"
+    End If
+    
+    tbBaffle_wall.Value = UserForm1.tbChambers.Value - 1
+    tbnumber_bafflewall_formwork.Value = (UserForm1.tbChambers.Value - 1) * 2
+    tbnumber_Bafflewall_materialtype.Value = UserForm1.tbChambers.Value - 1
+    tbnumber_longwall_plaster.Value = UserForm1.tbChambers.Value * 2
+    tbnumber_bafflewall_plaster.Value = (UserForm1.tbChambers.Value - 1) * 2
+    tbnumber_ABRfloor_plaster.Value = UserForm1.tbChambers.Value
+    
+    
+    
+End Sub
+
+Private Sub layout_configurer()
+
+    For Each looper In Me.Controls
+        On Error Resume Next
+        If TypeOf looper Is MSForms.TextBox Then
+            With looper
+            
+                .TextAlign = fmTextAlignCenter
+                .Font.Bold = True
+                .ForeColor = vbBlack
+                .BackColor = RGB(255, 204, 153)
+                .SpecialEffect = fmSpecialEffectFlat
+                .BorderColor = vbRed
+                       
+            End With
+        End If
+    Next looper
+    
+End Sub
+
+Private Sub populate_length()
+'earthwork
+    tblength_earthwork.Value = total_length
+    tblength_manhole_earthwork.Value = total_manhole_length
+'soling
+    tblength_foundation_soling.Value = total_length
+    tblength_manhole_soling.Value = total_manhole_length
+'PCC
+    tblength_ABR_PCCfoundation.Value = total_length
+    tblength_manhole_PCCFoundation.Value = total_manhole_length
+'RCC works in PCC
+    tblength_Baseslab_RCC.Value = total_length
+    tblength_coverslab_RCC.Value = total_length_coverslab
+    tblength_manhole_RCC.Value = total_manhole_length
+    tblength_longwall_RCC.Value = Round((UserForm1.tblength + 2 * UserForm1.tbCoverslab + UserForm1.tbOuterwall) / 1000, 2)
+    tblength_shortwall_RCC.Value = total_length_bafflewall
+    tblength_bafflewall_RCC.Value = total_length_bafflewall
+'Formwork
+    tblength_coverslab_Formwork.Value = total_length_coverslab
+    tblength_bafflewall_Formwork.Value = total_length_bafflewall
+'Material Type
+    tblength_manhole_stone_brick_work.Value = Round((2 * (UserForm1.tbManhole_L + 2 * UserForm1.tbManhole_T + UserForm1.tbManhole_B) / 1000), 2)
+    tblength_longwall_stone_brick_work.Value = total_length_coverslab
+    tblength_shortwall_stone_brick_work.Value = total_length_bafflewall
+    tblength_bafflewall_stone_brick_work.Value = total_length_bafflewall
+'Plaster
+    tblength_longwall_plaster.Value = plaster_length
+    tblength_shortwall_plaster.Value = total_length_bafflewall
+    tblength_bafflewall_plaster.Value = total_length_bafflewall
+    'tblength_manhole_plaster.Value = Round(2 * (UserForm1.tbManhole_B + UserForm1.tbManhole_L) / 1000, 2)
+    tblength_manholeinside_plaster.Value = Round((2 * Val(UserForm1.tbManhole_B) + Val(UserForm1.tbManhole_L.Value)) / 1000, 2)
+    tblength_ABRfloor_Plaster.Value = plaster_length
+    tblength_manholefloor_plaster.Value = Round((UserForm1.tbManhole_L) / 1000, 2)
+'Plumbing
+    tblength_plumbing.Value = Round((2 * (UserForm1.tblength / 1000) * (UserForm1.tbBreadth / 300) * (UserForm1.tbdepth - 200)) / 1000, 2)
+    
+End Sub
+
+
+
+Private Sub populate_breadth()
+    'earthworks
+    tbbreadth_earthwork.Value = total_breadth
+    tbbreadth_manhole_earthwork.Value = total_manhole_breadth
+    
+    'soling
+    tbbreadth_foundation_soling.Value = total_breadth
+    tbbreadth_manhole_soling.Value = total_manhole_breadth
+    
+    'PCC
+    tbbreadth_ABR_PCCfoundation.Value = total_breadth
+    tbbreadth_manhole_PCCfoundation.Value = total_manhole_breadth
+    
+    'PCC works in RCC
+    tbbreadth_baseslab_RCC.Value = total_breadth
+    tbbreadth_coverslab_RCC.Value = total_breadth_coverslab
+    tbbreadth_manhole_RCC.Value = total_manhole_breadth
+    tbbreadth_longwall_RCC.Value = longwall_shortwall
+    tbbreadth_shortwall_RCC.Value = longwall_shortwall
+    tbbreadth_bafflewall_RCC.Value = total_breadth_bafflewall
+    
+    'formwork
+    tbbreadth_PCC_formwork.Value = totalbreadth_formwork
+    tbbreadth_baseslab_formwork.Value = totalbreadth_formwork
+    tbbreadth_coverslab_formwork.Value = total_breadth_coverslab
+    'tbbreadth_bafflewall_formwork.Value = total_breadth_bafflewall
+    tbbreadth_outerwall_formwork.Value = outerwall_formwork
+    
+    'Based on material type
+    tbbreadth_manhole_stone_brick_work.Value = longwall_shortwall
+    tbbreadth_longwall_stone_brick_work.Value = longwall_shortwall
+    tbbreadth_shortwall_stone_brick_work.Value = longwall_shortwall
+    tbbreadth_bafflewall_stone_brick_work.Value = total_breadth_bafflewall
+    
+    'plaster
+    'tbbreadth_longwall_plaster.Value = plaster_breadth
+   ' tbbreadth_shortwall_plaster.Value = total_breadth_bafflewall
+   ' tbbreadth_bafflewall_plaster.Value = total_breadth_bafflewall
+    ''tbbreadth_manhole_plaster.Value = Round(2 * (UserForm1.tbManhole_B + UserForm1.tbManhole_L) / 1000, 2)
+    'tbbreadth_manholeinside_plaster.Value = Round((2 * (UserForm1.tbManhole_B.Value + UserForm1.tbManhole_L.Value)) / 1000, 2)
+    tbbreadth_ABRfloor_plaster.Value = Round(UserForm1.tbBreadth / 1000, 2)
+    tbbreadth_manholefloor_plaster.Value = Round((UserForm1.tbManhole_B) / 1000, 2)
+End Sub
+
+Private Sub populate_depth()
+    'earthworks
+    tbdepth_earthwork.Value = depth_earthwork
+    tbdepth_manhole_earthwork.Value = depth_manhole_earthwork
+    
+    'soling
+    'tbdepth_foundation_soling.Value = total_breadth
+    'tbdepth_manhole_soling.Value = total_manhole_breadth
+    
+    'PCC
+    tbdepth_ABR_PCC.Value = depth_atPCC
+    tbdepth_manhole_PCC.Value = depth_atPCC
+    
+    'PCC works in RCC
+    tbdepth_baseslab_RCC.Value = depth_baseslab
+    tbdepth_coverslab_RCC.Value = depth_coverslab
+    tbdepth_manhole_RCC.Value = depth_coverslab
+    tbdepth_longwall_RCC.Value = depth_longwall_shortwall_bafflewall
+    tbdepth_shortwall_RCC.Value = depth_longwall_shortwall_bafflewall
+    tbdepth_bafflewall_RCC.Value = depth_longwall_shortwall_bafflewall
+    
+    'formwork
+    tbdepth_PCC_formwork.Value = 0.1
+    tbdepth_baseslab_formwork.Value = depth_baseslab
+    'tbdepth_coverslab_formwork.Value = total_breadth_coverslab
+    tbdepth_bafflewall_formwork.Value = depth_bafflewall_formwork
+    tbdepth_outerwall_formwork.Value = depth_longwall_shortwall_bafflewall
+    
+    'Based on material type
+    tbdepth_manhole_stone_brick_work.Value = depth_manhole
+    tbdepth_longwall_stone_brick_work.Value = depth_longwall_shortwall_bafflewall
+    tbdepth_shortwall_stone_brick_work.Value = depth_longwall_shortwall_bafflewall
+    tbdepth_bafflewall_stone_brick_work.Value = depth_longwall_shortwall_bafflewall
+    
+    'plaster
+    tbdepth_longwall_plaster.Value = depth_longwall_shortwall_bafflewall
+    tbdepth_shortwall_plaster.Value = depth_longwall_shortwall_bafflewall
+    tbdepth_bafflewall_plaster.Value = depth_longwall_shortwall_bafflewall
+    tbdepth_manhole_plaster.Value = depth_manhole
+    'tbdepth_manholeinside_plaster.Value = Round((2 * (UserForm1.tbManhole_B.Value + UserForm1.tbManhole_L.Value)) / 1000, 2)
+    'tbdepth_ABRfloor_plaster.Value = Round(UserForm1.tbBreadth / 1000, 2)
+    'tbdepth_manholefloor_plaster.Value = Round((UserForm1.tbManhole_B) / 1000, 2)
+End Sub
+
+Private Sub populate_quantity()
+'earthwork
+    tbquantity_ABR_earthwork = Quantity_BOQ(tbnumber_ABR_earthwork, tblength_earthwork, tbbreadth_earthwork, tbdepth_earthwork)
+    tbquantity_manhole_earthwork = Quantity_BOQ(tbnumber_manhole_earthwork, tblength_manhole_earthwork, tbbreadth_manhole_earthwork, tbdepth_manhole_earthwork)
+    tbquantity_subtotal_earthwork = Quantity_subtotal(tbquantity_ABR_earthwork, tbquantity_manhole_earthwork)
+
+'Earthwork filling
+    tbquantity_subtotal_earthworkfilling = 0.25 * tbquantity_subtotal_earthwork
+
+'Soling
+    tbquantity_foundation_soling = Quantity_BOQ(tbnumber_foundation_soling, tblength_foundation_soling, tbbreadth_foundation_soling)
+    tbquantity_manhole_soling = Quantity_BOQ(tbnumber_manhole_soling, tblength_manhole_soling, tbbreadth_manhole_soling)
+    tbquantity_subtotal_soling = Quantity_subtotal(tbquantity_foundation_soling, tbquantity_manhole_soling)
+    
+'PCC
+    tbquantity_ABR_PCC = Quantity_BOQ(tbnumber_ABR_PCC, tblength_ABR_PCCfoundation, tbbreadth_ABR_PCCfoundation, tbdepth_ABR_PCC)
+    tbquantity_manhole_PCC = Quantity_BOQ(tbnumber_manhole_PCC, tblength_manhole_PCCFoundation, tbbreadth_manhole_PCCfoundation, tbdepth_manhole_PCC)
+    tbquantity_subtotal_PCC = Quantity_subtotal(tbquantity_ABR_PCC, tbquantity_manhole_PCC)
+
+'RCC
+    tbquantity_baseslab_RCC = Quantity_BOQ(tbnumber_baseslab_RCC, tblength_Baseslab_RCC, tbbreadth_baseslab_RCC, tbdepth_baseslab_RCC)
+    tbquantity_coverslab_RCC = Quantity_BOQ(tbnumber_coverslab_RCC, tblength_coverslab_RCC, tbbreadth_coverslab_RCC, tbdepth_coverslab_RCC)
+    tbquantity_manhole_RCC = Quantity_BOQ(tbnumber_manhole_RCC, tblength_manhole_RCC, tbbreadth_manhole_RCC, tbdepth_manhole_RCC)
+    
+    If UserForm1.CBMaterial.Value = "Brick" Or UserForm1.CBMaterial.Value = "stone" Then
+        tbquantity_longwall_RCC = 0
+    Else
+        tbquantity_longwall_RCC = Quantity_BOQ(tbnumber_longwall_RCC, tblength_longwall_RCC, tbbreadth_longwall_RCC, tbdepth_longwall_RCC)
+    End If
+    
+    If UserForm1.CBMaterial.Value = "Brick" Or UserForm1.CBMaterial.Value = "stone" Then
+        tbquantity_shortwall_RCC = 0
+    Else
+        tbquantity_shortwall_RCC = Quantity_BOQ(tbnumber_shortwall_RCC, tblength_shortwall_RCC, tbbreadth_shortwall_RCC, tbdepth_shortwall_RCC)
+    End If
+    
+    If UserForm1.CBMaterial.Value = "Brick" Then
+        tbquantity_bafflewall_RCC = 0
+    Else
+        tbquantity_bafflewall_RCC = Quantity_BOQ(tbBaffle_wall, tblength_bafflewall_RCC, tbbreadth_bafflewall_RCC, tbdepth_bafflewall_RCC)
+    End If
+    
+    tbquantity_subtotal_RCC = Quantity_subtotal(tbquantity_baseslab_RCC, tbquantity_coverslab_RCC, tbquantity_manhole_RCC, tbquantity_longwall_RCC, tbquantity_shortwall_RCC, tbquantity_bafflewall_RCC)
+    
+'Formwok
+    tbquantity_PCC_formwork = Quantity_BOQ(tbnumber_PCC_formwork, tbbreadth_PCC_formwork, tbdepth_PCC_formwork)
+    tbquantity_baseslab_formwork = Quantity_BOQ(tbnumber_baseslab_formwork, tbbreadth_baseslab_formwork, tbdepth_baseslab_formwork)
+    tbquantity_coverslab_formwork = Quantity_BOQ(tbnumber_coverslab_formwork, tblength_coverslab_Formwork, tbbreadth_coverslab_formwork)
+    
+    If UserForm1.CBMaterial.Value = "Brick" Or UserForm1.CBMaterial.Value = "stone" Then
+        tbquantity_outerwall_formwork = 0
+    Else
+        tbquantity_outerwall_formwork = Quantity_BOQ(tbnumber_outerwall_formwork, tbbreadth_outerwall_formwork, tbdepth_outerwall_formwork)
+    End If
+    
+    If UserForm1.CBMaterial.Value = "Brick" Then
+        tbquantity_bafflewall_formwork = 0
+    Else
+        tbquantity_bafflewall_formwork = Quantity_BOQ(tbnumber_bafflewall_formwork, tblength_bafflewall_Formwork, tbdepth_bafflewall_formwork)
+    End If
+    
+    tbquantity_subtotal_formwork = Quantity_subtotal(tbquantity_PCC_formwork, tbquantity_baseslab_formwork, tbquantity_coverslab_formwork, tbquantity_outerwall_formwork, tbquantity_bafflewall_formwork)
+
+'Reinforcement
+    '@ 2% of RCC works * density of steel (density of steel=7850)
+    tbquantity_reinforcement = 0.02 * tbquantity_subtotal_RCC * 7850
+    
+'Material Type
+    tbquantity_manhole_materialtype = Quantity_BOQ(tbnumber_manhole_materialtype, tblength_manhole_stone_brick_work, tbbreadth_manhole_stone_brick_work, tbdepth_manhole_stone_brick_work)
+    tbquantity_longwall_materialtype = Quantity_BOQ(tbnumber_longwall_materialtype, tblength_longwall_stone_brick_work, tbbreadth_longwall_stone_brick_work, tbdepth_longwall_stone_brick_work)
+    tbquantity_shortwall_materialtype = Quantity_BOQ(tbnumber_shortwall_materialtype, tblength_shortwall_stone_brick_work, tbbreadth_shortwall_stone_brick_work, tbdepth_shortwall_stone_brick_work)
+    tbquantity_bafflewall_materialtype = Quantity_BOQ(tbnumber_Bafflewall_materialtype, tblength_bafflewall_stone_brick_work, tbbreadth_bafflewall_stone_brick_work, tbdepth_bafflewall_stone_brick_work)
+    
+    tbquantity_subtotal_materialtype = Quantity_subtotal(tbquantity_manhole_materialtype, tbquantity_longwall_materialtype, tbquantity_shortwall_materialtype, tbquantity_bafflewall_materialtype)
+    
+'Plaster
+    tbquantity_longwall_plaster = Quantity_BOQ(tbnumber_longwall_plaster, tblength_longwall_plaster, tbdepth_longwall_plaster)
+    tbquantity_shortwall_plaster = Quantity_BOQ(tbnumber_shortwall_plaster, tblength_shortwall_plaster, tbdepth_shortwall_plaster)
+    tbquantity_bafflewall_plaster = Quantity_BOQ(tbnumber_bafflewall_plaster, tblength_bafflewall_plaster, tbdepth_bafflewall_plaster)
+    tbquantity_manhole_plaster = Quantity_BOQ(tbnumber_manhole_plaster, tblength_manholeinside_plaster, tbdepth_manhole_plaster)
+    tbquantity_ABRfloor_plaster = Quantity_BOQ(tbnumber_ABRfloor_plaster, tblength_ABRfloor_Plaster, tbbreadth_ABRfloor_plaster)
+    tbquantity_manholefloor_plaster = Quantity_BOQ(tbnumber_manholefloor_plaster, tblength_manholefloor_plaster, tbbreadth_manholefloor_plaster)
+    
+    tbquantity_subtotal_plaster = Quantity_subtotal(tbquantity_longwall_plaster, tbquantity_shortwall_plaster, tbquantity_bafflewall_plaster, tbquantity_manhole_plaster, tbquantity_ABRfloor_plaster, tbquantity_manholefloor_plaster)
+    
+'Punning
+    tbquantity_punning = tbquantity_subtotal_plaster
+
+'Plumbing
+    If UserForm1.tblength = 0 Then
+        tbquantity_plumbing = 0
+    Else
+        tbquantity_plumbing = Quantity_BOQ(tbnumber_plumbing, tblength_plumbing)
+
+'Operation and Maintenance
+    tbquantity_OM = 1#
+    End If
+End Sub
+
+Private Function Quantity_BOQ(ParamArray var() As Variant) As Double
+    Dim size As Integer
+    Dim product As Double
+    
+    product = 1#
+     
+    
+    For size = LBound(var) To UBound(var)
+        'If var(size) Is numeric Then
+        
+            product = Round(var(size) * product, 2)
+       ' Else
+            'MsgBox "value error"
+       ' End If
+    Next size
+    Quantity_BOQ = product
+End Function
+
+Private Function Quantity_subtotal(ParamArray param() As Variant) As Double
+    Dim size As Integer
+    Dim sum As Double
+    
+    sum = 0#
+     
+    
+    For size = LBound(param) To UBound(param)
+        sum = Round((param(size) + sum), 2)
+    Next size
+    Quantity_subtotal = sum
+End Function
+
+Private Sub populate_rate()
+    Dim looper As control
+    
+    For Each looper In Me.Rates.Controls
+    'On Error Resume Next
+       With looper
+            .Visible = True
+            .Locked = False
+            .SetFocus
+            .SpecialEffect = fmSpecialEffectSunken
+            .BorderColor = vbRed
+            .BackColor = vbGreen
+        End With
+     Next looper
+            
+End Sub
+Private Sub calc_cost_Click()
+    For Each looper In Me.Rates.Controls
+        If TypeOf looper Is MSForms.TextBox Then
+            If looper.Value = "" Or Not IsNumeric(looper.Value) Then
+                looper.ForeColor = vbRed
+                MsgBox "Not a valid input, please provide numeric value for rate:" & looper.Name
+                looper.Value = ""
+                Exit Sub
+            Else
+                'looper.BackColor = vbGreen
+                looper.ForeColor = vbBlack
+            End If
+        End If
+    Next looper
+    Call populate_totalcost
+    For Each looper In Me.Total_Costs.Controls
+        looper.Width = 50
+        looper.BorderColor = vbRed
+        looper.SetFocus
+        looper.BackColor = vbGreen
+    Next looper
+    Call check_emptycells
+End Sub
+
+Private Sub populate_totalcost()
+
+'Site clearance
+    tbtotalcost_siteclearance = Quantity_BOQ(tbquantity_siteclearance, tbrate_siteclearance)
+'Earthwork
+    tbtotalcost_earthwork = Quantity_BOQ(tbquantity_subtotal_earthwork, tbrate_earthwork)
+'Earthwork filling
+    tbtotalcost_earthworkfilling = Quantity_BOQ(tbquantity_subtotal_earthworkfilling, tbrate_earthworkfilling)
+'Soling
+    tbtotalcost_soling = Quantity_BOQ(tbquantity_subtotal_soling, tbrate_soling)
+'PCC
+    tbtotalcost_PCC = Quantity_BOQ(tbquantity_subtotal_PCC, tbrate_PCC)
+'PCC in RCC
+    tbtotalcost_RCC = Quantity_BOQ(tbquantity_subtotal_RCC, tbrate_RCC)
+'Material type work
+    tbtotalcost_formwork = Quantity_BOQ(tbquantity_subtotal_formwork, tbrate_formwork)
+'Reinforcement
+    tbtotalcost_reinforcement = Quantity_BOQ(tbquantity_reinforcement, tbrate_reinforcement)
+'Material work
+    tbtotalcost_materialtype = Quantity_BOQ(tbquantity_subtotal_materialtype, tbrate_materialtype)
+'Plaster
+    tbtotalcost_plaster = Quantity_BOQ(tbquantity_subtotal_plaster, tbrate_plaster)
+'Punning
+    tbtotalcost_punning = Quantity_BOQ(tbquantity_punning, tbrate_punning)
+'plumbing
+    tbtotalcost_plumbing = Quantity_BOQ(tbquantity_plumbing, tbrate_plumbing)
+'Operation and Maintenance
+    tbtotalcost_OM = Quantity_BOQ(tbquantity_OM, tbrate_OM)
+End Sub
+
+Private Sub check_emptycells()
+    For Each looper In Me.Controls
+        If TypeOf looper Is MSForms.TextBox Then
+            If looper.Value = 0 Or looper.Value = "" Then
+                looper.Value = "-"
+            End If
+        End If
+    Next looper
+    On Error Resume Next
+    
+End Sub
